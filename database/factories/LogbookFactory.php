@@ -24,4 +24,5 @@ class LogbookFactory extends Factory
             'description' => $this->faker->paragraph(),
         ];
     }
+
 }

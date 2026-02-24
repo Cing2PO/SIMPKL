@@ -14,6 +14,9 @@ class Attendance extends Model
         'placement_id',
         'date',
         'status',
+        'clock_in',
+        'clock_out',
+        'notes',
     ];
 
     public function placement()
