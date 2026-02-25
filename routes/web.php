@@ -55,9 +55,7 @@ Route::middleware('auth')->group(function () {
     // ------------------------------------------
     Route::get('/placements', [PlacementController::class, 'index'])->name('placements.index');
     Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
-    Route::get('/attendances/{attendance}', [AttendanceController::class, 'show'])->name('attendances.show');
     Route::get('/logbooks', [LogbookController::class, 'index'])->name('logbooks.index');
-    Route::get('/logbooks/{logbook}', [LogbookController::class, 'show'])->name('logbooks.show');
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
 
     // ------------------------------------------
@@ -99,6 +97,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/logbooks/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
         Route::post('/logbooks/{logbook}/delete', [LogbookController::class, 'delete'])->name('logbooks.delete');
     });
+
+    // Show routes AFTER create (wildcard must come last)
+    Route::get('/attendances/{attendance}', [AttendanceController::class, 'show'])->name('attendances.show');
+    Route::get('/logbooks/{logbook}', [LogbookController::class, 'show'])->name('logbooks.show');
 
     // ------------------------------------------
     // Guru only — CRUD Evaluation
