@@ -9,7 +9,18 @@ class LogbookController extends Controller
 {
     public function index()
     {
-        $logbooks = Logbook::with(['placement.user', 'placement.institution'])->get();
+        $user = auth()->user();
+
+        if ($user->role === 'murid') {
+            $logbooks = Logbook::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->get();
+        } elseif ($user->role === 'guru') {
+            $logbooks = Logbook::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
+        } else {
+            $logbooks = Logbook::with(['placement.user', 'placement.institution'])->get();
+        }
+
         return view('logbooks.index', ['logbooks' => $logbooks]);
     }
 
@@ -19,10 +30,14 @@ class LogbookController extends Controller
         return view('logbooks.view', ['logbook' => $logbook]);
     }
 
+    // === Murid only (protected by route middleware) ===
+
     public function create()
     {
+        $user = auth()->user();
         $title = "Add new logbook entry";
-        $placements = Placement::with(['user', 'institution'])->get();
+        $placements = Placement::with(['user', 'institution'])
+            ->where('student_id', $user->id)->get();
         return view('logbooks.create', ['title' => $title, 'placements' => $placements]);
     }
 
@@ -35,14 +50,21 @@ class LogbookController extends Controller
             'description' => 'required',
         ]);
 
+        // Pastikan placement milik murid ini
+        $user = auth()->user();
+        Placement::where('id', $data['placement_id'])
+            ->where('student_id', $user->id)->firstOrFail();
+
         Logbook::create($data);
         return redirect()->route('logbooks.index')->with('success', 'Logbook entry created successfully.');
     }
 
     public function edit(Logbook $logbook)
     {
+        $user = auth()->user();
         $title = "Edit logbook entry";
-        $placements = Placement::with(['user', 'institution'])->get();
+        $placements = Placement::with(['user', 'institution'])
+            ->where('student_id', $user->id)->get();
         return view('logbooks.edit', ['logbook' => $logbook, 'title' => $title, 'placements' => $placements]);
     }
 

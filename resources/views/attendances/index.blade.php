@@ -8,9 +8,11 @@
     <div class="max-w-7xl mx-auto">
         <div class="mb-8 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-900">All Attendance Records</h1>
+            @if(auth()->user()->role === 'murid')
             <a href="{{ route('attendances.create') }}"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">+
                 Add Attendance</a>
+            @endif
         </div>
 
         @if(session('success'))
@@ -61,6 +63,7 @@
                                 <div class="flex gap-2">
                                     <a href="{{ route('attendances.show', $attendance->id) }}"
                                         class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700">View</a>
+                                    @if(auth()->user()->role === 'murid')
                                     <a href="{{ route('attendances.edit', $attendance->id) }}"
                                         class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600">Edit</a>
                                     <form method="POST" action="{{ route('attendances.delete', $attendance->id) }}"
@@ -69,6 +72,7 @@
                                         <button type="submit"
                                             class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Delete</button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

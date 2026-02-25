@@ -31,15 +31,12 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:users,email',
-            'password'       => 'required|min:6',
-            'role'           => 'required|in:admin,murid,guru',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'role' => 'required|in:admin,murid,guru',
             'institution_id' => 'required|exists:institutions,id',
         ]);
-
-        // ✅ Hash password sebelum disimpan
-        $data['password'] = bcrypt($data['password']);
 
         User::create($data);
 
@@ -56,10 +53,10 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:users,email,' . $user->id,
-            'password'       => 'nullable|min:6',
-            'role'           => 'required|in:admin,murid,guru',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6',
+            'role' => 'required|in:admin,murid,guru',
             'institution_id' => 'required|exists:institutions,id',
         ]);
 

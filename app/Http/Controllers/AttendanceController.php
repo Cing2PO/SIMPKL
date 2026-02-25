@@ -9,7 +9,18 @@ class AttendanceController extends Controller
 {
     public function index()
     {
-        $attendances = Attendance::with(['placement.user', 'placement.institution'])->get();
+        $user = auth()->user();
+
+        if ($user->role === 'murid') {
+            $attendances = Attendance::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->get();
+        } elseif ($user->role === 'guru') {
+            $attendances = Attendance::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
+        } else {
+            $attendances = Attendance::with(['placement.user', 'placement.institution'])->get();
+        }
+
         return view('attendances.index', ['attendances' => $attendances]);
     }
 
@@ -19,10 +30,14 @@ class AttendanceController extends Controller
         return view('attendances.view', ['attendance' => $attendance]);
     }
 
+    // === Murid only (protected by route middleware) ===
+
     public function create()
     {
+        $user = auth()->user();
         $title = "Add new attendance record";
-        $placements = Placement::with(['user', 'institution'])->get();
+        $placements = Placement::with(['user', 'institution'])
+            ->where('student_id', $user->id)->get();
         return view('attendances.create', ['title' => $title, 'placements' => $placements]);
     }
 
@@ -37,14 +52,21 @@ class AttendanceController extends Controller
             'notes' => 'nullable',
         ]);
 
+        // Pastikan placement milik murid ini
+        $user = auth()->user();
+        $placement = Placement::where('id', $data['placement_id'])
+            ->where('student_id', $user->id)->firstOrFail();
+
         Attendance::create($data);
         return redirect()->route('attendances.index')->with('success', 'Attendance record created successfully.');
     }
 
     public function edit(Attendance $attendance)
     {
+        $user = auth()->user();
         $title = "Edit attendance record";
-        $placements = Placement::with(['user', 'institution'])->get();
+        $placements = Placement::with(['user', 'institution'])
+            ->where('student_id', $user->id)->get();
         return view('attendances.edit', ['attendance' => $attendance, 'title' => $title, 'placements' => $placements]);
     }
 

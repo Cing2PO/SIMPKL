@@ -38,15 +38,15 @@
                             <td class="px-6 py-4 text-sm text-gray-900 font-medium">{{ $placement->user?->name }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->institution?->name }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->mentor?->name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->start_date?->format('Y-m-d') }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->end_date?->format('Y-m-d') }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->start_date ? \Carbon\Carbon::parse($placement->start_date)->format('Y-m-d') : '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->end_date ? \Carbon\Carbon::parse($placement->end_date)->format('Y-m-d') : '-' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            @if($placement->status === 'active') bg-green-100 text-green-800
-                                            @elseif($placement->status === 'completed') bg-blue-100 text-blue-800
-                                            @elseif($placement->status === 'pending') bg-yellow-100 text-yellow-800
-                                            @else bg-gray-100 text-gray-800
-                                            @endif">
+                                                    @if($placement->status === 'active') bg-green-100 text-green-800
+                                                    @elseif($placement->status === 'completed') bg-blue-100 text-blue-800
+                                                    @elseif($placement->status === 'pending') bg-yellow-100 text-yellow-800
+                                                    @else bg-gray-100 text-gray-800
+                                                    @endif">
                                     {{ ucfirst($placement->status) }}
                                 </span>
                             </td>

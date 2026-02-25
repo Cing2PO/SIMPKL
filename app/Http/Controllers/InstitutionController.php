@@ -13,7 +13,8 @@ class InstitutionController extends Controller
         return view('institutions.index', ['institutions' => $institutions]);
     }
 
-    public function show(Institution $institution){
+    public function show(Institution $institution)
+    {
         return view('institutions.view', ['institution' => $institution]);
     }
 
