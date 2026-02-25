@@ -18,7 +18,9 @@ class EvaluationController extends Controller
             $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
                 ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
         } else {
-            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])->get();
+            // Admin: hanya evaluasi dari institusi sendiri
+            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->get();
         }
 
         return view('evaluations.index', ['evaluations' => $evaluations]);

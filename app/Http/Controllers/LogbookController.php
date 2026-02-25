@@ -18,7 +18,9 @@ class LogbookController extends Controller
             $logbooks = Logbook::with(['placement.user', 'placement.institution'])
                 ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
         } else {
-            $logbooks = Logbook::with(['placement.user', 'placement.institution'])->get();
+            // Admin: hanya logbook dari institusi sendiri
+            $logbooks = Logbook::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->get();
         }
 
         return view('logbooks.index', ['logbooks' => $logbooks]);

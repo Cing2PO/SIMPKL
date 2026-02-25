@@ -18,7 +18,9 @@ class AttendanceController extends Controller
             $attendances = Attendance::with(['placement.user', 'placement.institution'])
                 ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
         } else {
-            $attendances = Attendance::with(['placement.user', 'placement.institution'])->get();
+            // Admin: hanya attendance dari institusi sendiri
+            $attendances = Attendance::with(['placement.user', 'placement.institution'])
+                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->get();
         }
 
         return view('attendances.index', ['attendances' => $attendances]);

@@ -6,8 +6,11 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto">
-        <div class="mb-8">
+        <div class="mb-8 flex items-center justify-between">
             <h1 class="text-2xl font-bold text-gray-900">All Placements</h1>
+            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+                <a href="{{ route('placements.create') }}" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">+ Add Placement</a>
+            @endif
         </div>
 
         @if(session('success'))
@@ -29,6 +32,9 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Start Date</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">End Date</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                        @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -42,7 +48,7 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $placement->end_date ? \Carbon\Carbon::parse($placement->end_date)->format('Y-m-d') : '-' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                    @if($placement->status === 'active') bg-green-100 text-green-800
+                                                    @if($placement->status === 'active' || $placement->status === 'accepted') bg-green-100 text-green-800
                                                     @elseif($placement->status === 'completed') bg-blue-100 text-blue-800
                                                     @elseif($placement->status === 'pending') bg-yellow-100 text-yellow-800
                                                     @else bg-gray-100 text-gray-800
@@ -50,10 +56,21 @@
                                     {{ ucfirst($placement->status) }}
                                 </span>
                             </td>
+                            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                <td class="px-6 py-4 text-sm">
+                                    <div class="flex gap-2">
+                                        <a href="{{ route('placements.edit', $placement) }}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                                        <form method="POST" action="{{ route('placements.delete', $placement) }}" onsubmit="return confirm('Yakin ingin menghapus placement ini?')">
+                                            @csrf
+                                            <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-700">No placements found</td>
+                            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-700">No placements found</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -67,7 +84,7 @@
             </div>
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Active</div>
-                <div class="text-2xl font-bold text-green-600">{{ $placements->where('status', 'active')->count() }}</div>
+                <div class="text-2xl font-bold text-green-600">{{ $placements->whereIn('status', ['active', 'accepted'])->count() }}</div>
             </div>
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Completed</div>
