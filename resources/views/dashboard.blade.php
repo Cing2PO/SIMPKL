@@ -81,6 +81,7 @@
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Kehadiran</p>
                     <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stats['attendances'] }}</p>
+                    <p class="text-xs text-gray-400 mt-1">via detail placement</p>
                 </div>
                 <div class="bg-yellow-50 p-3 rounded-xl">
                     <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,19 +175,7 @@
                 </div>
             </a>
 
-            <!-- Attendances -->
-            <a href="{{ route('attendances.index') }}"
-                class="block bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-yellow-200 transition p-6 group">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <h4 class="text-lg font-semibold text-gray-900 group-hover:text-yellow-600 transition">Kehadiran
-                        </h4>
-                        <p class="text-gray-500 text-sm mt-1">Catatan kehadiran siswa</p>
-                        <span class="inline-flex items-center mt-3 text-yellow-600 text-sm font-medium">Buka →</span>
-                    </div>
-                    <div class="text-4xl opacity-20 group-hover:opacity-40 transition">📋</div>
-                </div>
-            </a>
+
 
             <!-- Logbooks -->
             <a href="{{ route('logbooks.index') }}"

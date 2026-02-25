@@ -70,7 +70,6 @@ Route::middleware('auth')->group(function () {
     // View-only routes (semua role bisa lihat)
     // ------------------------------------------
     Route::get('/placements', [PlacementController::class, 'index'])->name('placements.index');
-    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::get('/logbooks', [LogbookController::class, 'index'])->name('logbooks.index');
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
 
@@ -84,6 +83,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/placements/{placement}', [PlacementController::class, 'update'])->name('placements.update');
         Route::post('/placements/{placement}/delete', [PlacementController::class, 'delete'])->name('placements.delete');
     });
+
+    // Placement show (semua role bisa lihat detail)
+    Route::get('/placements/{placement}', [PlacementController::class, 'show'])->name('placements.show');
 
     // ------------------------------------------
     // Admin + Superadmin — Users CRUD
@@ -112,14 +114,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // ------------------------------------------
-    // Murid only — CRUD Attendance & Logbook
+    // Murid only — Check-in/Check-out & Logbook
     // ------------------------------------------
     Route::middleware('role:murid')->group(function () {
-        Route::get('/attendances/create', [AttendanceController::class, 'create'])->name('attendances.create');
-        Route::post('/attendances', [AttendanceController::class, 'store'])->name('attendances.store');
-        Route::get('/attendances/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendances.edit');
-        Route::post('/attendances/{attendance}', [AttendanceController::class, 'update'])->name('attendances.update');
-        Route::post('/attendances/{attendance}/delete', [AttendanceController::class, 'delete'])->name('attendances.delete');
+        Route::post('/placements/{placement}/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.checkIn');
+        Route::post('/attendances/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.checkOut');
 
         Route::get('/logbooks/create', [LogbookController::class, 'create'])->name('logbooks.create');
         Route::post('/logbooks', [LogbookController::class, 'store'])->name('logbooks.store');
@@ -129,7 +128,6 @@ Route::middleware('auth')->group(function () {
     });
 
     // Show routes AFTER create (wildcard must come last)
-    Route::get('/attendances/{attendance}', [AttendanceController::class, 'show'])->name('attendances.show');
     Route::get('/logbooks/{logbook}', [LogbookController::class, 'show'])->name('logbooks.show');
 
     // ------------------------------------------

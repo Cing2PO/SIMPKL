@@ -7,89 +7,62 @@ use App\Models\Placement;
 
 class AttendanceController extends Controller
 {
-    public function index()
+    /**
+     * Check-in: murid menekan tombol di halaman placement detail
+     */
+    public function checkIn(Placement $placement)
     {
         $user = auth()->user();
-
-        if ($user->role === 'murid') {
-            $attendances = Attendance::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->get();
-        } elseif ($user->role === 'guru') {
-            $attendances = Attendance::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
-        } else {
-            // Admin: hanya attendance dari institusi sendiri
-            $attendances = Attendance::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->get();
-        }
-
-        return view('attendances.index', ['attendances' => $attendances]);
-    }
-
-    public function show(Attendance $attendance)
-    {
-        $attendance->load(['placement.user', 'placement.institution']);
-        return view('attendances.view', ['attendance' => $attendance]);
-    }
-
-    // === Murid only (protected by route middleware) ===
-
-    public function create()
-    {
-        $user = auth()->user();
-        $title = "Add new attendance record";
-        $placements = Placement::with(['user', 'institution'])
-            ->where('student_id', $user->id)->get();
-        return view('attendances.create', ['title' => $title, 'placements' => $placements]);
-    }
-
-    public function store()
-    {
-        $data = request()->validate([
-            'placement_id' => 'required|exists:placements,id',
-            'date' => 'required|date',
-            'status' => 'required|in:hadir,absen,sakit,izin',
-            'clock_in' => 'nullable',
-            'clock_out' => 'nullable',
-            'notes' => 'nullable',
-        ]);
 
         // Pastikan placement milik murid ini
-        $user = auth()->user();
-        $placement = Placement::where('id', $data['placement_id'])
-            ->where('student_id', $user->id)->firstOrFail();
+        if ($placement->student_id !== $user->id) {
+            abort(403, 'Ini bukan placement Anda.');
+        }
 
-        Attendance::create($data);
-        return redirect()->route('attendances.index')->with('success', 'Attendance record created successfully.');
-    }
+        // Cek apakah sudah check-in hari ini
+        $existing = Attendance::where('placement_id', $placement->id)
+            ->where('date', now()->toDateString())->first();
 
-    public function edit(Attendance $attendance)
-    {
-        $user = auth()->user();
-        $title = "Edit attendance record";
-        $placements = Placement::with(['user', 'institution'])
-            ->where('student_id', $user->id)->get();
-        return view('attendances.edit', ['attendance' => $attendance, 'title' => $title, 'placements' => $placements]);
-    }
+        if ($existing) {
+            return redirect()->route('placements.show', $placement)
+                ->with('error', 'Anda sudah check-in hari ini.');
+        }
 
-    public function update(Attendance $attendance)
-    {
-        $data = request()->validate([
-            'placement_id' => 'required|exists:placements,id',
-            'date' => 'required|date',
-            'status' => 'required|in:hadir,absen,sakit,izin',
-            'clock_in' => 'nullable',
-            'clock_out' => 'nullable',
-            'notes' => 'nullable',
+        Attendance::create([
+            'placement_id' => $placement->id,
+            'date' => now()->toDateString(),
+            'status' => 'hadir',
+            'clock_in' => now()->format('H:i:s'),
+            'clock_out' => null,
+            'notes' => null,
         ]);
 
-        $attendance->update($data);
-        return redirect()->route('attendances.index')->with('success', 'Attendance record updated successfully.');
+        return redirect()->route('placements.show', $placement)
+            ->with('success', 'Check-in berhasil pada ' . now()->format('H:i') . '.');
     }
 
-    public function delete(Attendance $attendance)
+    /**
+     * Check-out: murid menekan tombol setelah check-in
+     */
+    public function checkOut(Attendance $attendance)
     {
-        $attendance->delete();
-        return redirect()->route('attendances.index')->with('success', 'Attendance record deleted successfully.');
+        $user = auth()->user();
+
+        // Pastikan attendance ini milik murid via placement
+        if ($attendance->placement->student_id !== $user->id) {
+            abort(403, 'Ini bukan attendance Anda.');
+        }
+
+        if ($attendance->clock_out) {
+            return redirect()->route('placements.show', $attendance->placement_id)
+                ->with('error', 'Anda sudah check-out hari ini.');
+        }
+
+        $attendance->update([
+            'clock_out' => now()->format('H:i:s'),
+        ]);
+
+        return redirect()->route('placements.show', $attendance->placement_id)
+            ->with('success', 'Check-out berhasil pada ' . now()->format('H:i') . '.');
     }
 }

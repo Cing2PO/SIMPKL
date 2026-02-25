@@ -30,6 +30,23 @@ class PlacementController extends Controller
         return view('placements.index', ['placements' => $placements]);
     }
 
+    public function show(Placement $placement)
+    {
+        $this->authorizePlacement($placement);
+
+        $placement->load(['user', 'institution', 'mentor']);
+
+        // Ambil semua attendance untuk placement ini, terbaru di atas
+        $attendances = \App\Models\Attendance::where('placement_id', $placement->id)
+            ->orderBy('date', 'desc')->get();
+
+        // Cek attendance hari ini
+        $todayAttendance = \App\Models\Attendance::where('placement_id', $placement->id)
+            ->where('date', now()->toDateString())->first();
+
+        return view('placements.show', compact('placement', 'attendances', 'todayAttendance'));
+    }
+
     public function create()
     {
         $admin = auth()->user();

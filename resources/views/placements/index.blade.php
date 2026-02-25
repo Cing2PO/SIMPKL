@@ -32,9 +32,7 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Start Date</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">End Date</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                        @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
-                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
-                        @endif
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -59,12 +57,17 @@
                             @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex gap-2">
+                                        <a href="{{ route('placements.show', $placement) }}" class="text-green-600 hover:text-green-800 font-medium">View</a>
                                         <a href="{{ route('placements.edit', $placement) }}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
                                         <form method="POST" action="{{ route('placements.delete', $placement) }}" onsubmit="return confirm('Yakin ingin menghapus placement ini?')">
                                             @csrf
                                             <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Delete</button>
                                         </form>
                                     </div>
+                                </td>
+                            @else
+                                <td class="px-6 py-4 text-sm">
+                                    <a href="{{ route('placements.show', $placement) }}" class="text-green-600 hover:text-green-800 font-medium">View</a>
                                 </td>
                             @endif
                         </tr>
