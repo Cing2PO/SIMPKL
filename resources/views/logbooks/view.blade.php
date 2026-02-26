@@ -7,17 +7,13 @@
 @section('content')
     <div class="max-w-2xl mx-auto">
         <div class="mb-6">
-            <a href="{{ route('logbooks.index') }}"
-                class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">← Back to Logbooks</a>
+            <a href="{{ route('placements.show', $placement) }}"
+                class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">← Back to Placement Detail</a>
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="px-6 py-8">
                 <div class="grid grid-cols-1 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ID</label>
-                        <div class="text-lg text-gray-900">{{ $logbook->id }}</div>
-                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Student</label>
                         <div class="text-lg text-gray-900">{{ $logbook->placement?->user?->name ?? '-' }}</div>
@@ -29,7 +25,8 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
                         <div class="text-lg text-gray-900">
-                            {{ $logbook->date ? \Carbon\Carbon::parse($logbook->date)->format('d M Y') : '-' }}</div>
+                            {{ $logbook->date ? \Carbon\Carbon::parse($logbook->date)->format('d M Y') : '-' }}
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Activity</label>
@@ -49,16 +46,18 @@
                     </div>
                 </div>
 
-                <div class="mt-8 flex gap-4">
-                    <a href="{{ route('logbooks.edit', $logbook->id) }}"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">Edit</a>
-                    <form method="POST" action="{{ route('logbooks.delete', $logbook->id) }}" class="inline"
-                        onsubmit="return confirm('Are you sure?');">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Delete</button>
-                    </form>
-                </div>
+                @if(auth()->user()->role === 'murid' && auth()->user()->id === $logbook->placement?->student_id)
+                    <div class="mt-8 flex gap-4">
+                        <a href="{{ route('logbooks.edit', [$placement, $logbook]) }}"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">Edit</a>
+                        <form method="POST" action="{{ route('logbooks.delete', [$placement, $logbook]) }}" class="inline"
+                            onsubmit="return confirm('Yakin ingin menghapus logbook ini?');">
+                            @csrf
+                            <button type="submit"
+                                class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Delete</button>
+                        </form>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

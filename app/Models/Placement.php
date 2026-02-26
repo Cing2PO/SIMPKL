@@ -31,4 +31,12 @@ class Placement extends Model
     {
         return $this->belongsTo(User::class, 'mentor_id');
     }
+    public function evaluations()
+    {
+        return $this->hasMany(Evaluation::class, 'placement_id');
+    }
+    public function logbooks()
+    {
+        return $this->hasMany(Logbook::class, 'placement_id');
+    }
 }

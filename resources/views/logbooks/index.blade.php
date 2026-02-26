@@ -8,11 +8,6 @@
     <div class="max-w-7xl mx-auto">
         <div class="mb-8 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-900">All Logbook Entries</h1>
-            @if(auth()->user()->role === 'murid')
-                <a href="{{ route('logbooks.create') }}"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">+
-                    Add New Entry</a>
-            @endif
         </div>
 
         @if(session('success'))
@@ -48,20 +43,9 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $logbook->activity }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">{{ $logbook->description }}</td>
                             <td class="px-6 py-4 text-sm">
-                                <div class="flex gap-2">
-                                    <a href="{{ route('logbooks.show', $logbook->id) }}"
-                                        class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700">View</a>
-                                    @if(auth()->user()->role === 'murid')
-                                        <a href="{{ route('logbooks.edit', $logbook->id) }}"
-                                            class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600">Edit</a>
-                                        <form method="POST" action="{{ route('logbooks.delete', $logbook->id) }}" class="inline"
-                                            onsubmit="return confirm('Are you sure?');">
-                                            @csrf
-                                            <button type="submit"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Delete</button>
-                                        </form>
-                                    @endif
-                                </div>
+                                <a href="{{ route('placements.show', $logbook->placement_id) }}"
+                                    class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">View
+                                    Placement</a>
                             </td>
                         </tr>
                     @empty

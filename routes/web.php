@@ -120,25 +120,25 @@ Route::middleware('auth')->group(function () {
         Route::post('/placements/{placement}/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.checkIn');
         Route::post('/attendances/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.checkOut');
 
-        Route::get('/logbooks/create', [LogbookController::class, 'create'])->name('logbooks.create');
-        Route::post('/logbooks', [LogbookController::class, 'store'])->name('logbooks.store');
-        Route::get('/logbooks/{logbook}/edit', [LogbookController::class, 'edit'])->name('logbooks.edit');
-        Route::post('/logbooks/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
-        Route::post('/logbooks/{logbook}/delete', [LogbookController::class, 'delete'])->name('logbooks.delete');
+        Route::get('/placements/{placement}/logbooks/create', [LogbookController::class, 'create'])->name('logbooks.create');
+        Route::post('/placements/{placement}/logbooks', [LogbookController::class, 'store'])->name('logbooks.store');
+        Route::get('/placements/{placement}/logbooks/{logbook}/edit', [LogbookController::class, 'edit'])->name('logbooks.edit');
+        Route::post('/placements/{placement}/logbooks/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
+        Route::post('/placements/{placement}/logbooks/{logbook}/delete', [LogbookController::class, 'delete'])->name('logbooks.delete');
     });
 
-    // Show routes AFTER create (wildcard must come last)
-    Route::get('/logbooks/{logbook}', [LogbookController::class, 'show'])->name('logbooks.show');
+    // Logbook & Evaluation show (semua role bisa lihat detail)
+    Route::get('/placements/{placement}/logbooks/{logbook}', [LogbookController::class, 'show'])->name('logbooks.show');
 
     // ------------------------------------------
-    // Guru only — CRUD Evaluation
+    // Guru only — CRUD Evaluation (nested under placements)
     // ------------------------------------------
     Route::middleware('role:guru')->group(function () {
-        Route::get('/evaluations/create', [EvaluationController::class, 'create'])->name('evaluations.create');
-        Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
-        Route::get('/evaluations/{evaluation}', [EvaluationController::class, 'show'])->name('evaluations.show');
-        Route::get('/evaluations/{evaluation}/edit', [EvaluationController::class, 'edit'])->name('evaluations.edit');
-        Route::post('/evaluations/{evaluation}', [EvaluationController::class, 'update'])->name('evaluations.update');
-        Route::post('/evaluations/{evaluation}/delete', [EvaluationController::class, 'delete'])->name('evaluations.delete');
+        Route::get('/placements/{placement}/evaluations/create', [EvaluationController::class, 'create'])->name('evaluations.create');
+        Route::post('/placements/{placement}/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
+        Route::get('/placements/{placement}/evaluations/{evaluation}', [EvaluationController::class, 'show'])->name('evaluations.show');
+        Route::get('/placements/{placement}/evaluations/{evaluation}/edit', [EvaluationController::class, 'edit'])->name('evaluations.edit');
+        Route::post('/placements/{placement}/evaluations/{evaluation}', [EvaluationController::class, 'update'])->name('evaluations.update');
+        Route::post('/placements/{placement}/evaluations/{evaluation}/delete', [EvaluationController::class, 'delete'])->name('evaluations.delete');
     });
 });

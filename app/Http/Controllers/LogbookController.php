@@ -26,66 +26,101 @@ class LogbookController extends Controller
         return view('logbooks.index', ['logbooks' => $logbooks]);
     }
 
-    public function show(Logbook $logbook)
+    public function show(Placement $placement, Logbook $logbook)
     {
+        // Pastikan logbook milik placement ini
+        if ($logbook->placement_id !== $placement->id) {
+            abort(404);
+        }
+
         $logbook->load(['placement.user', 'placement.institution']);
-        return view('logbooks.view', ['logbook' => $logbook]);
+        return view('logbooks.view', compact('placement', 'logbook'));
     }
 
     // === Murid only (protected by route middleware) ===
 
-    public function create()
+    public function create(Placement $placement)
     {
         $user = auth()->user();
+
+        // Pastikan placement milik murid ini
+        if ($placement->student_id !== $user->id) {
+            abort(403, 'Ini bukan placement Anda.');
+        }
+
+        $placement->load(['user', 'institution']);
         $title = "Add new logbook entry";
-        $placements = Placement::with(['user', 'institution'])
-            ->where('student_id', $user->id)->get();
-        return view('logbooks.create', ['title' => $title, 'placements' => $placements]);
+        return view('logbooks.create', compact('title', 'placement'));
     }
 
-    public function store()
+    public function store(Placement $placement)
     {
+        $user = auth()->user();
+
+        // Pastikan placement milik murid ini
+        if ($placement->student_id !== $user->id) {
+            abort(403, 'Ini bukan placement Anda.');
+        }
+
         $data = request()->validate([
-            'placement_id' => 'required|exists:placements,id',
             'date' => 'required|date',
             'activity' => 'required',
             'description' => 'required',
         ]);
 
-        // Pastikan placement milik murid ini
-        $user = auth()->user();
-        Placement::where('id', $data['placement_id'])
-            ->where('student_id', $user->id)->firstOrFail();
+        $data['placement_id'] = $placement->id;
 
         Logbook::create($data);
-        return redirect()->route('logbooks.index')->with('success', 'Logbook entry created successfully.');
+        return redirect()->route('placements.show', $placement)
+            ->with('success', 'Logbook entry berhasil dibuat.');
     }
 
-    public function edit(Logbook $logbook)
+    public function edit(Placement $placement, Logbook $logbook)
     {
         $user = auth()->user();
+
+        // Pastikan logbook milik placement ini
+        if ($logbook->placement_id !== $placement->id) {
+            abort(404);
+        }
+
+        // Pastikan placement milik murid ini
+        if ($placement->student_id !== $user->id) {
+            abort(403, 'Ini bukan placement Anda.');
+        }
+
+        $placement->load(['user', 'institution']);
         $title = "Edit logbook entry";
-        $placements = Placement::with(['user', 'institution'])
-            ->where('student_id', $user->id)->get();
-        return view('logbooks.edit', ['logbook' => $logbook, 'title' => $title, 'placements' => $placements]);
+        return view('logbooks.edit', compact('logbook', 'title', 'placement'));
     }
 
-    public function update(Logbook $logbook)
+    public function update(Placement $placement, Logbook $logbook)
     {
+        // Pastikan logbook milik placement ini
+        if ($logbook->placement_id !== $placement->id) {
+            abort(404);
+        }
+
         $data = request()->validate([
-            'placement_id' => 'required|exists:placements,id',
             'date' => 'required|date',
             'activity' => 'required',
             'description' => 'required',
         ]);
 
         $logbook->update($data);
-        return redirect()->route('logbooks.index')->with('success', 'Logbook entry updated successfully.');
+        return redirect()->route('placements.show', $placement)
+            ->with('success', 'Logbook entry berhasil diperbarui.');
     }
 
-    public function delete(Logbook $logbook)
+    public function delete(Placement $placement, Logbook $logbook)
     {
+        // Pastikan logbook milik placement ini
+        if ($logbook->placement_id !== $placement->id) {
+            abort(404);
+        }
+
         $logbook->delete();
-        return redirect()->route('logbooks.index')->with('success', 'Logbook entry deleted successfully.');
+        return redirect()->route('placements.show', $placement)
+            ->with('success', 'Logbook entry berhasil dihapus.');
     }
 }

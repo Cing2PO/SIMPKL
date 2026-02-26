@@ -44,7 +44,13 @@ class PlacementController extends Controller
         $todayAttendance = \App\Models\Attendance::where('placement_id', $placement->id)
             ->where('date', now()->toDateString())->first();
 
-        return view('placements.show', compact('placement', 'attendances', 'todayAttendance'));
+        // Ambil semua evaluasi untuk placement ini
+        $evaluations = $placement->evaluations()->orderBy('created_at', 'desc')->get();
+
+        // Ambil semua logbook untuk placement ini
+        $logbooks = $placement->logbooks()->orderBy('date', 'desc')->get();
+
+        return view('placements.show', compact('placement', 'attendances', 'todayAttendance', 'evaluations', 'logbooks'));
     }
 
     public function create()

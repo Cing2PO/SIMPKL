@@ -7,8 +7,8 @@
 @section('content')
     <div class="max-w-2xl mx-auto">
         <div class="mb-6">
-            <a href="{{ route('evaluations.index') }}"
-                class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">← Back to Evaluations</a>
+            <a href="{{ route('placements.show', $placement) }}"
+                class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">← Back to Placement Detail</a>
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -60,10 +60,10 @@
 
             @if(auth()->user()->role === 'guru')
                 <div class="flex gap-4 justify-end px-6 py-4 bg-gray-50 border-t border-gray-200">
-                    <a href="{{ route('evaluations.edit', $evaluation->id) }}"
+                    <a href="{{ route('evaluations.edit', [$placement, $evaluation]) }}"
                         class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600">Edit</a>
-                    <form method="POST" action="{{ route('evaluations.delete', $evaluation->id) }}" class="inline"
-                        onsubmit="return confirm('Are you sure?');">
+                    <form method="POST" action="{{ route('evaluations.delete', [$placement, $evaluation]) }}" class="inline"
+                        onsubmit="return confirm('Yakin ingin menghapus evaluasi ini?');">
                         @csrf
                         <button type="submit"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Delete</button>
