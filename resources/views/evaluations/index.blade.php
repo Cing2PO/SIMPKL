@@ -40,10 +40,10 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $evaluation->placement?->institution?->name }}</td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold
-                                            @if($evaluation->final_score >= 85) bg-green-100 text-green-800
-                                            @elseif($evaluation->final_score >= 70) bg-blue-100 text-blue-800
-                                            @else bg-red-100 text-red-800
-                                            @endif">
+                                                    @if($evaluation->final_score >= 85) bg-green-100 text-green-800
+                                                    @elseif($evaluation->final_score >= 70) bg-blue-100 text-blue-800
+                                                    @else bg-red-100 text-red-800
+                                                    @endif">
                                     {{ $evaluation->final_score }}
                                 </span>
                             </td>
@@ -72,22 +72,15 @@
             </table>
         </div>
 
-        <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-200">
+            {{ $evaluations->links() }}
+        </div>
+
+        <div class="mt-8">
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Total Evaluations</div>
-                <div class="text-2xl font-bold text-gray-900">{{ $evaluations->count() }}</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-600 text-sm">Average Score</div>
-                <div class="text-2xl font-bold text-gray-900">{{ number_format($evaluations->avg('final_score'), 2) }}</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-600 text-sm">Highest Score</div>
-                <div class="text-2xl font-bold text-green-600">{{ $evaluations->max('final_score') ?? '-' }}</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-600 text-sm">Lowest Score</div>
-                <div class="text-2xl font-bold text-red-600">{{ $evaluations->min('final_score') ?? '-' }}</div>
+                <div class="text-2xl font-bold text-gray-900">{{ $evaluations->total() }}</div>
             </div>
         </div>
     </div>

@@ -57,10 +57,15 @@
             </table>
         </div>
 
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-200">
+            {{ $logbooks->links() }}
+        </div>
+
         <div class="mt-8">
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Total Logbook Entries</div>
-                <div class="text-2xl font-bold text-gray-900">{{ $logbooks->count() }}</div>
+                <div class="text-2xl font-bold text-gray-900">{{ $logbooks->total() }}</div>
             </div>
         </div>
     </div>

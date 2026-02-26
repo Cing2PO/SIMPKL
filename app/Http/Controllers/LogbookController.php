@@ -13,14 +13,14 @@ class LogbookController extends Controller
 
         if ($user->role === 'murid') {
             $logbooks = Logbook::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->get();
+                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->paginate(10);
         } elseif ($user->role === 'guru') {
             $logbooks = Logbook::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
+                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->paginate(10);
         } else {
             // Admin: hanya logbook dari institusi sendiri
             $logbooks = Logbook::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->get();
+                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->paginate(10);
         }
 
         return view('logbooks.index', ['logbooks' => $logbooks]);

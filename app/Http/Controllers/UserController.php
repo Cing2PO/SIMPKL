@@ -15,10 +15,10 @@ class UserController extends Controller
         $admin = auth()->user();
 
         if ($admin->role === 'superadmin') {
-            $users = User::with('institution')->get();
+            $users = User::with('institution')->paginate(10);
         } else {
             $users = User::with('institution')
-                ->where('institution_id', $admin->institution_id)->get();
+                ->where('institution_id', $admin->institution_id)->paginate(10);
         }
 
         return view('users.index', compact('users'));

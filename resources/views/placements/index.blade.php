@@ -80,10 +80,15 @@
             </table>
         </div>
 
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-200">
+            {{ $placements->links() }}
+        </div>
+
         <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Total Placements</div>
-                <div class="text-2xl font-bold text-gray-900">{{ $placements->count() }}</div>
+                <div class="text-2xl font-bold text-gray-900">{{ $placements->total() }}</div>
             </div>
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Active</div>

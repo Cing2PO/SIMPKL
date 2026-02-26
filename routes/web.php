@@ -87,6 +87,11 @@ Route::middleware('auth')->group(function () {
     // Placement show (semua role bisa lihat detail)
     Route::get('/placements/{placement}', [PlacementController::class, 'show'])->name('placements.show');
 
+    // Placement sub-pages
+    Route::get('/placements/{placement}/attendances', [PlacementController::class, 'attendances'])->name('placements.attendances');
+    Route::get('/placements/{placement}/logbook-list', [PlacementController::class, 'placementLogbooks'])->name('placements.logbooks');
+    Route::get('/placements/{placement}/evaluation-list', [PlacementController::class, 'placementEvaluations'])->name('placements.evaluations');
+
     // ------------------------------------------
     // Admin + Superadmin — Users CRUD
     // ------------------------------------------

@@ -15,16 +15,16 @@ class PlacementController extends Controller
 
         if ($user->role === 'murid') {
             $placements = Placement::with(['user', 'institution', 'mentor'])
-                ->where('student_id', $user->id)->get();
+                ->where('student_id', $user->id)->paginate(10);
         } elseif ($user->role === 'guru') {
             $placements = Placement::with(['user', 'institution', 'mentor'])
-                ->where('mentor_id', $user->id)->get();
+                ->where('mentor_id', $user->id)->paginate(10);
         } elseif ($user->role === 'superadmin') {
-            $placements = Placement::with(['user', 'institution', 'mentor'])->get();
+            $placements = Placement::with(['user', 'institution', 'mentor'])->paginate(10);
         } else {
             // Admin: hanya placement dari institusi sendiri
             $placements = Placement::with(['user', 'institution', 'mentor'])
-                ->where('institution_id', $user->institution_id)->get();
+                ->where('institution_id', $user->institution_id)->paginate(10);
         }
 
         return view('placements.index', ['placements' => $placements]);
@@ -35,22 +35,46 @@ class PlacementController extends Controller
         $this->authorizePlacement($placement);
 
         $placement->load(['user', 'institution', 'mentor']);
+        $placement->loadCount(['evaluations', 'logbooks']);
 
-        // Ambil semua attendance untuk placement ini, terbaru di atas
+        // Count attendances manually
+        $placement->attendances_count = \App\Models\Attendance::where('placement_id', $placement->id)->count();
+
+        return view('placements.show', compact('placement'));
+    }
+
+    public function attendances(Placement $placement)
+    {
+        $this->authorizePlacement($placement);
+        $placement->load(['user', 'institution', 'mentor']);
+
         $attendances = \App\Models\Attendance::where('placement_id', $placement->id)
             ->orderBy('date', 'desc')->get();
 
-        // Cek attendance hari ini
         $todayAttendance = \App\Models\Attendance::where('placement_id', $placement->id)
             ->where('date', now()->toDateString())->first();
 
-        // Ambil semua evaluasi untuk placement ini
-        $evaluations = $placement->evaluations()->orderBy('created_at', 'desc')->get();
+        return view('placements.attendances', compact('placement', 'attendances', 'todayAttendance'));
+    }
 
-        // Ambil semua logbook untuk placement ini
+    public function placementLogbooks(Placement $placement)
+    {
+        $this->authorizePlacement($placement);
+        $placement->load(['user', 'institution']);
+
         $logbooks = $placement->logbooks()->orderBy('date', 'desc')->get();
 
-        return view('placements.show', compact('placement', 'attendances', 'todayAttendance', 'evaluations', 'logbooks'));
+        return view('placements.placement_logbooks', compact('placement', 'logbooks'));
+    }
+
+    public function placementEvaluations(Placement $placement)
+    {
+        $this->authorizePlacement($placement);
+        $placement->load(['user', 'institution', 'mentor']);
+
+        $evaluations = $placement->evaluations()->orderBy('created_at', 'desc')->get();
+
+        return view('placements.placement_evaluations', compact('placement', 'evaluations'));
     }
 
     public function create()

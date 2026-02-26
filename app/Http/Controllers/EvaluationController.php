@@ -13,14 +13,14 @@ class EvaluationController extends Controller
 
         if ($user->role === 'murid') {
             $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->get();
+                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->paginate(10);
         } elseif ($user->role === 'guru') {
             $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->get();
+                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->paginate(10);
         } else {
             // Admin: hanya evaluasi dari institusi sendiri
             $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->get();
+                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->paginate(10);
         }
 
         return view('evaluations.index', ['evaluations' => $evaluations]);

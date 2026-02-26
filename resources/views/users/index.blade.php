@@ -51,11 +51,11 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ $user->email }}</td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            @if($user->role === 'superadmin') bg-red-100 text-red-800
-                                            @elseif($user->role === 'admin') bg-blue-100 text-blue-800
-                                            @elseif($user->role === 'guru') bg-green-100 text-green-800
-                                            @else bg-yellow-100 text-yellow-800
-                                            @endif">
+                                                    @if($user->role === 'superadmin') bg-red-100 text-red-800
+                                                    @elseif($user->role === 'admin') bg-blue-100 text-blue-800
+                                                    @elseif($user->role === 'guru') bg-green-100 text-green-800
+                                                    @else bg-yellow-100 text-yellow-800
+                                                    @endif">
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
@@ -84,11 +84,16 @@
             </table>
         </div>
 
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-200">
+            {{ $users->links() }}
+        </div>
+
         <!-- Summary -->
         <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Total Users</div>
-                <div class="text-2xl font-bold text-gray-900">{{ $users->count() }}</div>
+                <div class="text-2xl font-bold text-gray-900">{{ $users->total() }}</div>
             </div>
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Admin</div>

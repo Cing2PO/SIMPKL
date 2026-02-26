@@ -69,10 +69,15 @@
             </table>
         </div>
 
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-200">
+            {{ $institutions->links() }}
+        </div>
+
         <div class="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Total Institutions</div>
-                <div class="text-2xl font-bold text-gray-900">{{ $institutions->count() }}</div>
+                <div class="text-2xl font-bold text-gray-900">{{ $institutions->total() }}</div>
             </div>
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-gray-600 text-sm">Active</div>
