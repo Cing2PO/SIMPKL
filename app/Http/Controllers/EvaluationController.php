@@ -11,6 +11,7 @@ class EvaluationController extends Controller
     {
         $user = auth()->user();
 
+        // Global scope otomatis memfilter evaluasi berdasarkan institution_id via placement.
         if ($user->role === 'murid') {
             $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
                 ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->paginate(10);
@@ -18,9 +19,8 @@ class EvaluationController extends Controller
             $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
                 ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->paginate(10);
         } else {
-            // Admin: hanya evaluasi dari institusi sendiri
-            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('institution_id', $user->institution_id))->paginate(10);
+            // Admin & Superadmin: global scope otomatis enforce institution filter
+            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])->paginate(10);
         }
 
         return view('evaluations.index', ['evaluations' => $evaluations]);

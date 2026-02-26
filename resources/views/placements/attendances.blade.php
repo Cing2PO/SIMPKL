@@ -67,6 +67,30 @@
             </div>
         @endif
 
+        {{-- Rekap Kehadiran --}}
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-4 text-center">
+                <div class="text-gray-500 text-xs font-medium uppercase tracking-wider">Total Hari</div>
+                <div class="mt-2 text-2xl font-bold text-gray-900">{{ $recap['total'] }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center border-b-4 border-green-500">
+                <div class="text-gray-500 text-xs font-medium uppercase tracking-wider">Hadir</div>
+                <div class="mt-2 text-2xl font-bold text-green-600">{{ $recap['hadir'] }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center border-b-4 border-blue-500">
+                <div class="text-gray-500 text-xs font-medium uppercase tracking-wider">Izin</div>
+                <div class="mt-2 text-2xl font-bold text-blue-600">{{ $recap['izin'] }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center border-b-4 border-yellow-500">
+                <div class="text-gray-500 text-xs font-medium uppercase tracking-wider">Sakit</div>
+                <div class="mt-2 text-2xl font-bold text-yellow-600">{{ $recap['sakit'] }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center border-b-4 border-red-500">
+                <div class="text-gray-500 text-xs font-medium uppercase tracking-wider">Absen</div>
+                <div class="mt-2 text-2xl font-bold text-red-600">{{ $recap['absen'] }}</div>
+            </div>
+        </div>
+
         {{-- Riwayat Attendance --}}
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
@@ -87,15 +111,16 @@
                         @forelse($attendances as $attendance)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm text-gray-900">
-                                    {{ \Carbon\Carbon::parse($attendance->date)->format('d M Y') }}</td>
+                                    {{ \Carbon\Carbon::parse($attendance->date)->format('d M Y') }}
+                                </td>
                                 <td class="px-6 py-4 text-sm">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                @if($attendance->status === 'hadir') bg-green-100 text-green-800
-                                                @elseif($attendance->status === 'absen') bg-red-100 text-red-800
-                                                @elseif($attendance->status === 'sakit') bg-yellow-100 text-yellow-800
-                                                @elseif($attendance->status === 'izin') bg-blue-100 text-blue-800
-                                                @else bg-gray-100 text-gray-800
-                                                @endif">
+                                                        @if($attendance->status === 'hadir') bg-green-100 text-green-800
+                                                        @elseif($attendance->status === 'absen') bg-red-100 text-red-800
+                                                        @elseif($attendance->status === 'sakit') bg-yellow-100 text-yellow-800
+                                                        @elseif($attendance->status === 'izin') bg-blue-100 text-blue-800
+                                                        @else bg-gray-100 text-gray-800
+                                                        @endif">
                                         {{ ucfirst($attendance->status) }}
                                     </span>
                                 </td>

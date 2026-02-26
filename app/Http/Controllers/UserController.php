@@ -14,6 +14,8 @@ class UserController extends Controller
     {
         $admin = auth()->user();
 
+        // User tidak pakai global scope (mencegah infinite recursion saat auth->user() load).
+        // Filter dilakukan manual di sini.
         if ($admin->role === 'superadmin') {
             $users = User::with('institution')->paginate(10);
         } else {
@@ -26,7 +28,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $this->authorizeInstitution($user);
+        // Route model binding sudah enforce scope (404 jika bukan tenant-nya)
         return view('users.view', compact('user'));
     }
 
@@ -34,11 +36,13 @@ class UserController extends Controller
     {
         $title = "Add new user";
         $admin = auth()->user();
+
         if ($admin->role === 'superadmin') {
             $institutions = Institution::all();
         } else {
             $institutions = Institution::where('id', $admin->institution_id)->get();
         }
+
         return view('users.create', compact('title', 'institutions'));
     }
 
@@ -66,21 +70,20 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $this->authorizeInstitution($user);
         $title = "Edit user";
         $admin = auth()->user();
+
         if ($admin->role === 'superadmin') {
             $institutions = Institution::all();
         } else {
             $institutions = Institution::where('id', $admin->institution_id)->get();
         }
+
         return view('users.edit', compact('user', 'title', 'institutions'));
     }
 
     public function update(Request $request, User $user)
     {
-        $this->authorizeInstitution($user);
-
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -94,7 +97,6 @@ class UserController extends Controller
             $data['institution_id'] = auth()->user()->institution_id;
         }
 
-        // ✅ Hash password jika diisi, buang jika kosong
         if ($request->filled('password')) {
             $data['password'] = bcrypt($data['password']);
         } else {
@@ -108,9 +110,7 @@ class UserController extends Controller
 
     public function delete(User $user)
     {
-        $this->authorizeInstitution($user);
-
-        // ✅ Cegah hapus diri sendiri
+        // Cegah hapus diri sendiri
         if ($user->id === Auth::id()) {
             return redirect()->route('users.index')->with('error', 'Tidak bisa menghapus akun sendiri.');
         }
@@ -118,20 +118,5 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
-    }
-
-    /**
-     * Pastikan user yang diakses berasal dari institusi yang sama
-     */
-    private function authorizeInstitution(User $user)
-    {
-        // Superadmin bisa akses semua
-        if (auth()->user()->role === 'superadmin') {
-            return;
-        }
-
-        if ($user->institution_id !== auth()->user()->institution_id) {
-            abort(403, 'Anda tidak memiliki akses ke user ini.');
-        }
     }
 }

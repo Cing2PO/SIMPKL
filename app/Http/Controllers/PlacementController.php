@@ -13,18 +13,17 @@ class PlacementController extends Controller
     {
         $user = auth()->user();
 
+        // Global scope sudah membatasi berdasarkan institution_id secara otomatis.
+        // Di sini hanya perlu filter berdasarkan ROLE (murid / guru).
         if ($user->role === 'murid') {
             $placements = Placement::with(['user', 'institution', 'mentor'])
                 ->where('student_id', $user->id)->paginate(10);
         } elseif ($user->role === 'guru') {
             $placements = Placement::with(['user', 'institution', 'mentor'])
                 ->where('mentor_id', $user->id)->paginate(10);
-        } elseif ($user->role === 'superadmin') {
-            $placements = Placement::with(['user', 'institution', 'mentor'])->paginate(10);
         } else {
-            // Admin: hanya placement dari institusi sendiri
-            $placements = Placement::with(['user', 'institution', 'mentor'])
-                ->where('institution_id', $user->institution_id)->paginate(10);
+            // Admin & Superadmin: global scope otomatis filter institution_id
+            $placements = Placement::with(['user', 'institution', 'mentor'])->paginate(10);
         }
 
         return view('placements.index', ['placements' => $placements]);
@@ -32,8 +31,7 @@ class PlacementController extends Controller
 
     public function show(Placement $placement)
     {
-        $this->authorizePlacement($placement);
-
+        // Global scope + route model binding sudah memastikan 404 jika bukan tenant-nya
         $placement->load(['user', 'institution', 'mentor']);
         $placement->loadCount(['evaluations', 'logbooks']);
 
@@ -45,7 +43,6 @@ class PlacementController extends Controller
 
     public function attendances(Placement $placement)
     {
-        $this->authorizePlacement($placement);
         $placement->load(['user', 'institution', 'mentor']);
 
         $attendances = \App\Models\Attendance::where('placement_id', $placement->id)
@@ -54,12 +51,20 @@ class PlacementController extends Controller
         $todayAttendance = \App\Models\Attendance::where('placement_id', $placement->id)
             ->where('date', now()->toDateString())->first();
 
-        return view('placements.attendances', compact('placement', 'attendances', 'todayAttendance'));
+        // Calculate Recap
+        $recap = [
+            'total' => $attendances->count(),
+            'hadir' => $attendances->where('status', 'hadir')->count(),
+            'izin' => $attendances->where('status', 'izin')->count(),
+            'sakit' => $attendances->where('status', 'sakit')->count(),
+            'absen' => $attendances->where('status', 'absen')->count(),
+        ];
+
+        return view('placements.attendances', compact('placement', 'attendances', 'todayAttendance', 'recap'));
     }
 
     public function placementLogbooks(Placement $placement)
     {
-        $this->authorizePlacement($placement);
         $placement->load(['user', 'institution']);
 
         $logbooks = $placement->logbooks()->orderBy('date', 'desc')->get();
@@ -69,7 +74,6 @@ class PlacementController extends Controller
 
     public function placementEvaluations(Placement $placement)
     {
-        $this->authorizePlacement($placement);
         $placement->load(['user', 'institution', 'mentor']);
 
         $evaluations = $placement->evaluations()->orderBy('created_at', 'desc')->get();
@@ -86,7 +90,7 @@ class PlacementController extends Controller
             $students = User::where('role', 'murid')->get();
             $mentors = User::where('role', 'guru')->get();
         } else {
-            $institutions = collect(); // Admin tidak perlu pilih institusi
+            $institutions = collect();
             $students = User::where('role', 'murid')
                 ->where('institution_id', $admin->institution_id)->get();
             $mentors = User::where('role', 'guru')
@@ -112,16 +116,6 @@ class PlacementController extends Controller
         // Paksa institution_id = institution admin (kecuali superadmin)
         if ($admin->role !== 'superadmin') {
             $data['institution_id'] = $admin->institution_id;
-
-            // Validasi bahwa student & mentor dari institusi yang sama
-            $studentInst = User::where('id', $data['student_id'])
-                ->where('institution_id', $admin->institution_id)->exists();
-            $mentorInst = User::where('id', $data['mentor_id'])
-                ->where('institution_id', $admin->institution_id)->exists();
-
-            if (!$studentInst || !$mentorInst) {
-                return back()->withErrors(['authorization' => 'Siswa atau mentor bukan dari institusi Anda.'])->withInput();
-            }
         }
 
         Placement::create($data);
@@ -131,8 +125,6 @@ class PlacementController extends Controller
 
     public function edit(Placement $placement)
     {
-        $this->authorizePlacement($placement);
-
         $admin = auth()->user();
 
         if ($admin->role === 'superadmin') {
@@ -152,8 +144,6 @@ class PlacementController extends Controller
 
     public function update(Request $request, Placement $placement)
     {
-        $this->authorizePlacement($placement);
-
         $admin = auth()->user();
 
         $data = $request->validate([
@@ -167,15 +157,6 @@ class PlacementController extends Controller
 
         if ($admin->role !== 'superadmin') {
             $data['institution_id'] = $admin->institution_id;
-
-            $studentInst = User::where('id', $data['student_id'])
-                ->where('institution_id', $admin->institution_id)->exists();
-            $mentorInst = User::where('id', $data['mentor_id'])
-                ->where('institution_id', $admin->institution_id)->exists();
-
-            if (!$studentInst || !$mentorInst) {
-                return back()->withErrors(['authorization' => 'Siswa atau mentor bukan dari institusi Anda.'])->withInput();
-            }
         }
 
         $placement->update($data);
@@ -185,24 +166,8 @@ class PlacementController extends Controller
 
     public function delete(Placement $placement)
     {
-        $this->authorizePlacement($placement);
-
         $placement->delete();
 
         return redirect()->route('placements.index')->with('success', 'Placement berhasil dihapus.');
-    }
-
-    /**
-     * Pastikan placement yang diakses berasal dari institusi yang sama
-     */
-    private function authorizePlacement(Placement $placement)
-    {
-        if (auth()->user()->role === 'superadmin') {
-            return;
-        }
-
-        if ($placement->institution_id !== auth()->user()->institution_id) {
-            abort(403, 'Anda tidak memiliki akses ke placement ini.');
-        }
     }
 }

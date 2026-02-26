@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scopes\TenantScope;
 
 class Placement extends Model
 {
@@ -18,6 +19,11 @@ class Placement extends Model
         'start_date',
         'end_date',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new TenantScope);
+    }
 
     public function institution()
     {
