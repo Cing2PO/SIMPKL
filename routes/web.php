@@ -10,7 +10,12 @@ use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
-    return view('welcome');
+    try {
+        $plans = \App\Models\plans::orderBy('price')->get();
+    } catch (\Exception $e) {
+        $plans = collect();
+    }
+    return view('welcome', compact('plans'));
 });
 
 // ==========================================

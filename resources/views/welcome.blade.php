@@ -501,6 +501,165 @@
             }
         }
 
+        /* ===== PRICING ===== */
+        .pricing {
+            padding: 6rem 2rem;
+            background: var(--surface);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(79, 70, 229, 0.1);
+            border-color: rgba(79, 70, 229, 0.25);
+        }
+
+        .pricing-card.featured {
+            background: linear-gradient(160deg, #4f46e5, #312e81);
+            border-color: transparent;
+            color: white;
+        }
+
+        .pricing-card.featured:hover {
+            box-shadow: 0 16px 48px rgba(79, 70, 229, 0.35);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 1rem;
+            border-radius: 100px;
+            white-space: nowrap;
+        }
+
+        .pricing-name {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .pricing-price {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.25rem;
+            margin: 0.75rem 0;
+        }
+
+        .pricing-price .amount {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        .pricing-price .period {
+            font-size: 0.85rem;
+            opacity: 0.65;
+            padding-bottom: 0.25rem;
+        }
+
+        .pricing-duration {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: -0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1rem 0;
+            opacity: 0.5;
+        }
+
+        .pricing-card.featured .pricing-divider {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pricing-features-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            flex: 1;
+        }
+
+        .pricing-features-list li {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.85;
+        }
+
+        .pricing-features-list li::before {
+            content: '✓';
+            font-weight: 700;
+            color: #4ade80;
+            flex-shrink: 0;
+        }
+
+        .pricing-card.featured .pricing-features-list li::before {
+            color: #86efac;
+        }
+
+        .pricing-cta {
+            margin-top: 1.5rem;
+            display: block;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1.5px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .pricing-cta:hover {
+            background: var(--primary-50);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pricing-card.featured .pricing-cta {
+            background: white;
+            color: #4f46e5;
+            border-color: transparent;
+        }
+
+        .pricing-card.featured .pricing-cta:hover {
+            background: #eef2ff;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .navbar {
@@ -527,6 +686,10 @@
                 padding: 3rem 1.5rem;
             }
 
+            .pricing {
+                padding: 4rem 1.25rem;
+            }
+
             .nav-actions .btn-ghost {
                 display: none;
             }
@@ -545,13 +708,14 @@
             </a>
 
             <div class="nav-actions">
+                <a href="#pricing" class="btn btn-ghost">Harga</a>
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="btn btn-primary">Dashboard</a>
                     @else
                         <a href="{{ route('auth.loginForm') }}" class="btn btn-ghost">Masuk</a>
                         @if (Route::has('auth.registerForm'))
-                            <a href="{{ route('auth.registerForm') }}" class="btn btn-primary">Daftar</a>
+                            <a href="{{ route('auth.registerForm') }}" class="btn btn-primary">Daftar Gratis</a>
                         @endif
                     @endauth
                 @endif
@@ -657,6 +821,88 @@
         </div>
     </section>
 
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="section-inner">
+            <div class="section-header">
+                <span class="section-label">Paket Langganan</span>
+                <h2 class="section-title">Harga yang Transparan</h2>
+                <p class="section-desc">Pilih paket yang sesuai dengan kebutuhan sekolah Anda.</p>
+            </div>
+
+            @if($plans->isNotEmpty())
+                <div class="pricing-grid">
+                    @foreach($plans as $index => $plan)
+                        @php
+                            $isFree = $plan->price == 0;
+                            $isFeatured = !$isFree && $index === (int) ceil($plans->count() / 2);
+                            $features = $plan->features ? json_decode($plan->features, true) : [];
+                        @endphp
+                        <div class="pricing-card {{ $isFeatured ? 'featured' : '' }}">
+                            @if($isFeatured)
+                                <div class="pricing-badge">⭐ Paling Populer</div>
+                            @endif
+
+                            <div class="pricing-name">{{ $plan->name }}</div>
+
+                            <div class="pricing-price">
+                                @if($isFree)
+                                    <span class="amount">Gratis</span>
+                                @else
+                                    <span style="font-size:1rem;opacity:.65;padding-bottom:.5rem">Rp</span>
+                                    <span class="amount">{{ number_format($plan->price, 0, ',', '.') }}</span>
+                                    <span class="period">/bulan</span>
+                                @endif
+                            </div>
+
+                            @if($plan->duration)
+                                <div class="pricing-duration">Masa aktif: {{ $plan->duration }} hari</div>
+                            @endif
+
+                            <div class="pricing-divider"></div>
+
+                            @if(!empty($features))
+                                <ul class="pricing-features-list">
+                                    @foreach($features as $feature)
+                                        <li>{{ $feature }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <ul class="pricing-features-list">
+                                    @if($isFree)
+                                        <li>Manajemen Penempatan</li>
+                                        <li>Logbook Digital</li>
+                                        <li>Absensi Online</li>
+                                        <li>Maks. 30 siswa aktif</li>
+                                    @else
+                                        <li>Semua fitur paket lebih rendah</li>
+                                        <li>Logbook & Absensi tidak terbatas</li>
+                                        <li>Evaluasi & Penilaian</li>
+                                        <li>Export PDF Laporan</li>
+                                        @if($plan->price >= 200000)
+                                            <li>Prioritas dukungan</li>
+                                            <li>Kustomisasi branding</li>
+                                        @endif
+                                    @endif
+                                </ul>
+                            @endif
+
+                            @auth
+                                <a href="{{ url('/dashboard') }}" class="pricing-cta">Buka Dashboard</a>
+                            @else
+                                <a href="{{ route('auth.registerForm') }}" class="pricing-cta">
+                                    {{ $isFree ? 'Mulai Gratis' : 'Coba Sekarang' }}
+                                </a>
+                            @endauth
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p style="text-align:center;color:var(--text-muted)">Paket langganan akan segera tersedia.</p>
+            @endif
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="cta">
         <div class="cta-card">
@@ -707,7 +953,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.feature-card, .stat-item').forEach(el => {
+        document.querySelectorAll('.feature-card, .stat-item, .pricing-card').forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';
             el.style.transition = 'all 0.5s ease';
