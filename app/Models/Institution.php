@@ -15,6 +15,7 @@ class Institution extends Model
         'address',
         'contact_email',
         'contact_phone',
+        'plan_id',
         'status',
     ];
 
@@ -25,5 +26,10 @@ class Institution extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function plans()
+    {
+        return $this->belongsTo(plans::class);
     }
 }

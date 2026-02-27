@@ -16,12 +16,19 @@ class InstitutionFactory extends Factory
      */
     public function definition(): array
     {
+        $planId = \App\Models\Plans::inRandomOrder()->first()?->id;
+        if ($planId == 1) {
+            $status = 'trial';
+        } else {
+            $status = $this->faker->randomElement(['active', 'canceled', 'expired']);
+        }
         return [
             'name' => $this->faker->company(),
             'address' => $this->faker->address(),
             'contact_email' => $this->faker->unique()->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),
-            'status' => $this->faker->randomElement(['active', 'inactive']),
+            'plan_id' => $planId,
+            'status' => $status,
         ];
     }
 }
