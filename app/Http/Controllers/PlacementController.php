@@ -9,22 +9,34 @@ use Illuminate\Http\Request;
 
 class PlacementController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $user = auth()->user();
+        $search = $request->input('search');
+        $status = $request->input('status');
 
-        // Global scope sudah membatasi berdasarkan institution_id secara otomatis.
-        // Di sini hanya perlu filter berdasarkan ROLE (murid / guru).
+        $query = Placement::with(['user', 'institution', 'mentor']);
+
         if ($user->role === 'murid') {
-            $placements = Placement::with(['user', 'institution', 'mentor'])
-                ->where('student_id', $user->id)->paginate(10);
+            $query->where('student_id', $user->id);
         } elseif ($user->role === 'guru') {
-            $placements = Placement::with(['user', 'institution', 'mentor'])
-                ->where('mentor_id', $user->id)->paginate(10);
-        } else {
-            // Admin & Superadmin: global scope otomatis filter institution_id
-            $placements = Placement::with(['user', 'institution', 'mentor'])->paginate(10);
+            $query->where('mentor_id', $user->id);
         }
+
+        // Search by student name or institution name
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('institution', fn($i) => $i->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        // Filter by status
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $placements = $query->paginate(10)->appends($request->query());
 
         return view('placements.index', ['placements' => $placements]);
     }

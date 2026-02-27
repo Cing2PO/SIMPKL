@@ -7,21 +7,38 @@ use App\Models\Placement;
 
 class EvaluationController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $user = auth()->user();
+        $search = $request->input('search');
+        $grade = $request->input('grade');
 
-        // Global scope otomatis memfilter evaluasi berdasarkan institution_id via placement.
+        $query = Evaluation::with(['placement.user', 'placement.institution']);
+
         if ($user->role === 'murid') {
-            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->paginate(10);
+            $query->whereHas('placement', fn($q) => $q->where('student_id', $user->id));
         } elseif ($user->role === 'guru') {
-            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->paginate(10);
-        } else {
-            // Admin & Superadmin: global scope otomatis enforce institution filter
-            $evaluations = Evaluation::with(['placement.user', 'placement.institution'])->paginate(10);
+            $query->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id));
         }
+
+        // Search by student name or institution name
+        if ($search) {
+            $query->whereHas('placement', function ($q) use ($search) {
+                $q->whereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('institution', fn($i) => $i->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        // Filter by grade
+        if ($grade === 'A') {
+            $query->where('final_score', '>=', 85);
+        } elseif ($grade === 'B') {
+            $query->whereBetween('final_score', [70, 84]);
+        } elseif ($grade === 'C') {
+            $query->where('final_score', '<', 70);
+        }
+
+        $evaluations = $query->paginate(10)->appends($request->query());
 
         return view('evaluations.index', ['evaluations' => $evaluations]);
     }

@@ -10,6 +10,23 @@
             <h1 class="text-2xl font-bold text-gray-900">All Logbook Entries</h1>
         </div>
 
+        <!-- Search & Filter Form -->
+        <form method="GET" action="{{ route('logbooks.index') }}"
+            class="mb-6 flex flex-wrap gap-3 items-center bg-white rounded-lg shadow p-4">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari aktivitas atau nama siswa..."
+                class="flex-1 min-w-[200px] border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="date" name="date_from" value="{{ request('date_from') }}" title="Dari tanggal"
+                class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input type="date" name="date_to" value="{{ request('date_to') }}" title="Sampai tanggal"
+                class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit"
+                class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">Cari</button>
+            @if(request()->hasAny(['search', 'date_from', 'date_to']))
+                <a href="{{ route('logbooks.index') }}"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300">Reset</a>
+            @endif
+        </form>
+
         @if(session('success'))
             <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">{{ session('success') }}
             </div>

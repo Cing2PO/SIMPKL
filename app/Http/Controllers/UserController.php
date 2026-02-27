@@ -10,18 +10,33 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $admin = auth()->user();
+        $search = $request->input('search');
+        $role = $request->input('role');
 
-        // User tidak pakai global scope (mencegah infinite recursion saat auth->user() load).
-        // Filter dilakukan manual di sini.
-        if ($admin->role === 'superadmin') {
-            $users = User::with('institution')->paginate(10);
-        } else {
-            $users = User::with('institution')
-                ->where('institution_id', $admin->institution_id)->paginate(10);
+        $query = User::with('institution');
+
+        // Tenant scope manual
+        if ($admin->role !== 'superadmin') {
+            $query->where('institution_id', $admin->institution_id);
         }
+
+        // Search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter role
+        if ($role) {
+            $query->where('role', $role);
+        }
+
+        $users = $query->paginate(10)->appends($request->query());
 
         return view('users.index', compact('users'));
     }

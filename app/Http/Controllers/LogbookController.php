@@ -7,21 +7,38 @@ use App\Models\Placement;
 
 class LogbookController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $user = auth()->user();
+        $search = $request->input('search');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
 
-        // Global scope otomatis memfilter logbook berdasarkan institution_id via placement.
+        $query = Logbook::with(['placement.user', 'placement.institution']);
+
         if ($user->role === 'murid') {
-            $logbooks = Logbook::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('student_id', $user->id))->paginate(10);
+            $query->whereHas('placement', fn($q) => $q->where('student_id', $user->id));
         } elseif ($user->role === 'guru') {
-            $logbooks = Logbook::with(['placement.user', 'placement.institution'])
-                ->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id))->paginate(10);
-        } else {
-            // Admin & Superadmin: global scope otomatis enforce institution filter
-            $logbooks = Logbook::with(['placement.user', 'placement.institution'])->paginate(10);
+            $query->whereHas('placement', fn($q) => $q->where('mentor_id', $user->id));
         }
+
+        // Search by activity text or student name
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('activity', 'like', "%{$search}%")
+                    ->orWhereHas('placement.user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        // Date range filter
+        if ($dateFrom) {
+            $query->whereDate('date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('date', '<=', $dateTo);
+        }
+
+        $logbooks = $query->orderBy('date', 'desc')->paginate(10)->appends($request->query());
 
         return view('logbooks.index', ['logbooks' => $logbooks]);
     }

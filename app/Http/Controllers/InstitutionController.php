@@ -3,13 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Institution;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Unique;
 
 class InstitutionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $institutions = Institution::paginate(10);
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        $query = Institution::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('contact_email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $institutions = $query->paginate(10)->appends($request->query());
         return view('institutions.index', ['institutions' => $institutions]);
     }
 
