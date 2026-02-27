@@ -35,6 +35,7 @@ class AttendanceController extends Controller
             'clock_in' => now()->format('H:i:s'),
             'clock_out' => null,
             'notes' => null,
+            'institution_id' => $placement->institution_id,
         ]);
 
         return redirect()->route('placements.show', $placement)

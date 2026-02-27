@@ -86,6 +86,7 @@ class LogbookController extends Controller
         ]);
 
         $data['placement_id'] = $placement->id;
+        $data['institution_id'] = $placement->institution_id;
 
         Logbook::create($data);
         return redirect()->route('placements.show', $placement)

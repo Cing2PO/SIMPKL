@@ -21,10 +21,16 @@ class Logbook extends Model
         'date',
         'activity',
         'description',
+        'institution_id',
     ];
 
     public function placement()
     {
         return $this->belongsTo(Placement::class, 'placement_id');
+    }
+
+    public function institution()
+    {
+        return $this->belongsTo(Institution::class, 'institution_id');
     }
 }

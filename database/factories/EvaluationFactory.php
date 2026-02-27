@@ -16,8 +16,10 @@ class EvaluationFactory extends Factory
      */
     public function definition(): array
     {
+        $placement = \App\Models\Placement::inRandomOrder()->first();
         return [
-            'placement_id' => \App\Models\Placement::inRandomOrder()->first()?->id,
+            'placement_id' => $placement->id,
+            'institution_id' => $placement->institution_id,
             'final_score' => $this->faker->numberBetween(1, 100),
             'feedback' => $this->faker->paragraph(),
         ];

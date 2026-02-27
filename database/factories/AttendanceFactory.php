@@ -17,8 +17,10 @@ class AttendanceFactory extends Factory
      */
     public function definition(): array
     {
+        $placement = \App\Models\Placement::inRandomOrder()->first();
         return [
-            'placement_id' => \App\Models\Placement::inRandomOrder()->first()?->id,
+            'placement_id' => $placement->id,
+            'institution_id' => $placement->institution_id,
             'date' => $this->faker->date(),
             'status' => $this->faker->randomElement(['hadir', 'absen', 'sakit', 'izin']),
         ];

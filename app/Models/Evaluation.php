@@ -20,10 +20,16 @@ class Evaluation extends Model
         'placement_id',
         'final_score',
         'feedback',
+        'institution_id',
     ];
 
     public function placement()
     {
         return $this->belongsTo(Placement::class, 'placement_id');
+    }
+
+    public function institution()
+    {
+        return $this->belongsTo(Institution::class, 'institution_id');
     }
 }

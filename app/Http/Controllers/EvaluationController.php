@@ -85,6 +85,7 @@ class EvaluationController extends Controller
         ]);
 
         $data['placement_id'] = $placement->id;
+        $data['institution_id'] = $placement->institution_id;
 
         Evaluation::create($data);
         return redirect()->route('placements.show', $placement)

@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
         // Create 1 superadmin manually
         \App\Models\User::create([
             'name' => 'SuperAdmin',
-            'email' => 'superadmin@simpkl.local',
+            'email' => 'superadmin@example.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
             'email_verified_at' => now(),
             'role' => 'superadmin',
