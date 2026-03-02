@@ -25,6 +25,8 @@ Route::get('/login', [AuthController::class, 'loginForm'])->name('auth.loginForm
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::get('/register', [AuthController::class, 'registerForm'])->name('auth.registerForm');
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
+Route::get('/register-tenant', [AuthController::class, 'registerTenantForm'])->name('tenant.registerForm');
+Route::post('/register-tenant', [AuthController::class, 'registerTenant'])->name('tenant.register');
 
 // ==========================================
 // Protected Routes (All Authenticated Users)

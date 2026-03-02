@@ -714,9 +714,7 @@
                         <a href="{{ url('/dashboard') }}" class="btn btn-primary">Dashboard</a>
                     @else
                         <a href="{{ route('auth.loginForm') }}" class="btn btn-ghost">Masuk</a>
-                        @if (Route::has('auth.registerForm'))
-                            <a href="{{ route('auth.registerForm') }}" class="btn btn-primary">Daftar Gratis</a>
-                        @endif
+                        <a href="{{ route('tenant.registerForm') }}" class="btn btn-primary">Daftar Institusi</a>
                     @endauth
                 @endif
             </div>
@@ -747,9 +745,7 @@
                     <a href="{{ route('auth.loginForm') }}" class="btn btn-primary btn-lg">
                         Masuk Sekarang
                     </a>
-                    @if (Route::has('auth.registerForm'))
-                        <a href="{{ route('auth.registerForm') }}" class="btn btn-outline btn-lg">Buat Akun</a>
-                    @endif
+                    <a href="{{ route('tenant.registerForm') }}" class="btn btn-outline btn-lg">Daftar Institusi</a>
                 @endauth
             </div>
         </div>
@@ -890,8 +886,8 @@
                             @auth
                                 <a href="{{ url('/dashboard') }}" class="pricing-cta">Buka Dashboard</a>
                             @else
-                                <a href="{{ route('auth.registerForm') }}" class="pricing-cta">
-                                    {{ $isFree ? 'Mulai Gratis' : 'Coba Sekarang' }}
+                                <a href="{{ route('tenant.registerForm') }}" class="pricing-cta">
+                                    {{ $isFree ? 'Mulai Gratis' : 'Daftar Sekarang' }}
                                 </a>
                             @endauth
                         </div>
@@ -913,10 +909,8 @@
                     <a href="{{ url('/dashboard') }}" class="btn btn-white btn-lg">Buka Dashboard</a>
                 @else
                     <a href="{{ route('auth.loginForm') }}" class="btn btn-white btn-lg">Masuk Sekarang</a>
-                    @if (Route::has('auth.registerForm'))
-                        <a href="{{ route('auth.registerForm') }}" class="btn btn-outline btn-lg"
-                            style="color: white; border-color: rgba(255,255,255,0.3);">Daftar Gratis</a>
-                    @endif
+                    <a href="{{ route('tenant.registerForm') }}" class="btn btn-outline btn-lg"
+                        style="color: white; border-color: rgba(255,255,255,0.3);">Daftar Institusi</a>
                 @endauth
             </div>
         </div>

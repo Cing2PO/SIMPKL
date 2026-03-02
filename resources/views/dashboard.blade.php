@@ -39,22 +39,24 @@
             </div>
         </div>
 
-        <!-- Institutions -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm font-medium">Institusi</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stats['institutions'] }}</p>
-                </div>
-                <div class="bg-green-50 p-3 rounded-xl">
-                    <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                        </path>
-                    </svg>
+        @if(Auth::user()->role === 'superadmin')
+            <!-- Institutions -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Institusi</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stats['institutions'] }}</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-xl">
+                        <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
 
         <!-- Placements -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
@@ -148,18 +150,20 @@
                 </div>
             </a>
 
-            <!-- Institutions -->
-            <a href="{{ route('institutions.index') }}"
-                class="block bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition p-6 group">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <h4 class="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition">Institusi</h4>
-                        <p class="text-gray-500 text-sm mt-1">Lokasi penempatan siswa</p>
-                        <span class="inline-flex items-center mt-3 text-green-600 text-sm font-medium">Buka →</span>
+            @if(Auth::user()->role === 'superadmin')
+                <!-- Institutions -->
+                <a href="{{ route('institutions.index') }}"
+                    class="block bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition p-6 group">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition">Institusi</h4>
+                            <p class="text-gray-500 text-sm mt-1">Lokasi penempatan siswa</p>
+                            <span class="inline-flex items-center mt-3 text-green-600 text-sm font-medium">Buka →</span>
+                        </div>
+                        <div class="text-4xl opacity-20 group-hover:opacity-40 transition">🏢</div>
                     </div>
-                    <div class="text-4xl opacity-20 group-hover:opacity-40 transition">🏢</div>
-                </div>
-            </a>
+                </a>
+            @endif
 
             <!-- Placements -->
             <a href="{{ route('placements.index') }}"
